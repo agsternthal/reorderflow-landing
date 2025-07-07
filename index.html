@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReorderFlow - Automated Reorder Reminders</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9fafb;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Navigation */
+        nav {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #6b7280;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            padding: 15px 30px;
+            border: 2px solid white;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-secondary:hover {
+            background: white;
+            color: #2563eb;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 24px;
+            line-height: 1.1;
+        }
+        
+        .hero-subtitle {
+            color: #bfdbfe;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+        }
+        
+        .btn-hero {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-hero-primary {
+            background: white;
+            color: #2563eb;
+        }
+        
+        .btn-hero-primary:hover {
+            background: #f3f4f6;
+        }
+        
+        /* Sections */
+        .section {
+            padding: 80px 0;
+        }
+        
+        .section-white {
+            background: white;
+        }
+        
+        .section-gray {
+            background: #f9fafb;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 16px;
+            color: #111827;
+        }
+        
+        .section-subtitle {
+            font-size: 1.25rem;
+            text-align: center;
+            color: #6b7280;
+            max-width: 800px;
+            margin: 0 auto 60px;
+        }
+        
+        /* Grid layouts */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-problem {
+            background: #fef2f2;
+        }
+        
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .icon-red {
+            color: #ef4444;
+        }
+        
+        .icon-blue {
+            color: #2563eb;
+        }
+        
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .card p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+        
+        /* How it works section */
+        .how-it-works {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        .steps {
+            list-style: none;
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        
+        .step-number {
+            background: #2563eb;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .step-content h4 {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .step-content p {
+            color: #6b7280;
+        }
+        
+        /* Sample reminder */
+        .sample-reminder {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .reminder-header {
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .reminder-content {
+            border-left: 4px solid #2563eb;
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .reminder-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-green {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .btn-gray {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        /* Pricing */
+        .pricing-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        
+        .pricing-popular {
+            border: 2px solid #2563eb;
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2563eb;
+            color: white;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .price {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #2563eb;
+            margin: 20px 0;
+        }
+        
+        .price-period {
+            font-size: 1rem;
+            color: #6b7280;
+        }
+        
+        .features {
+            list-style: none;
+            margin: 30px 0;
+        }
+        
+        .features li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .checkmark {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        /* CTA Section */
+        .cta {
+            background: #2563eb;
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .cta h2 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .cta p {
+            font-size: 1.25rem;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Footer */
+        footer {
+            background: #111827;
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-section h4 {
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            padding-top: 30px;
+            text-align: center;
+            color: #9ca3af;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .how-it-works {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .hero-buttons, .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="logo">ReorderFlow</div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#" class="btn-primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Stop Chasing Reorders.<br><span class="hero-subtitle">Automate Follow-ups.</span></h1>
+            <p>Automated reorder reminders for CPG manufacturers and distributors. Send personalized emails, SMS, and AI voice calls to busy buyers.</p>
+            <div class="hero-buttons">
+                <a href="#" class="btn-hero btn-hero-primary">Start Free Trial</a>
+                <a href="#" class="btn-secondary">Watch Demo</a>
+            </div>
+            <p style="color: #bfdbfe; margin-bottom: 0;">Trusted by 500+ CPG businesses</p>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="section section-white">
+        <div class="container">
+            <h2 class="section-title">The CPG Follow-up Problem</h2>
+            <p class="section-subtitle">Busy buyers forget to reorder. You spend hours chasing follow-ups. Stockouts happen. Revenue suffers.</p>
+            
+            <div class="grid-3">
+                <div class="card card-problem">
+                    <div class="card-icon icon-red">⏰</div>
+                    <h3>Time Wasted</h3>
+                    <p>2-3 hours daily on manual follow-ups and tracking</p>
+                </div>
+                <div class="card card-problem">
+                    <div class="card-icon icon-red">📉</div>
+                    <h3>Lost Revenue</h3>
+                    <p>Missed reorders due to poor timing and follow-up</p>
+                </div>
+                <div class="card card-problem">
+                    <div class="card-icon icon-red">😤</div>
+                    <h3>Frustrated Buyers</h3>
+                    <p>Stockouts hurt your customers' businesses</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section class="section section-gray">
+        <div class="container">
+            <h2 class="section-title">Smart Automation That Actually Works</h2>
+            <p class="section-subtitle">ReorderFlow tracks your customers' order cycles and automatically sends personalized reminders at the perfect time.</p>
+            
+            <div class="how-it-works">
+                <div>
+                    <h3 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 30px;">How It Works</h3>
+                    <ul class="steps">
+                        <li class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Import Your Contacts</h4>
+                                <p>Upload CSV or connect your CRM</p>
+                            </div>
+                        </li>
+                        <li class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Set Reorder Cycles</h4>
+                                <p>Define when each product typically needs reordering</p>
+                            </div>
+                        </li>
+                        <li class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Automated Outreach</h4>
+                                <p>Email, SMS, and AI voice calls sent automatically</p>
+                            </div>
+                        </li>
+                        <li class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Track & Optimize</h4>
+                                <p>Monitor responses and improve your timing</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="sample-reminder">
+                    <div class="reminder-header">SAMPLE REMINDER</div>
+                    <div class="reminder-content">
+                        <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 8px;">Subject: Time to reorder Premium Protein Bars?</p>
+                        <p><strong>Hi Sarah,</strong></p>
+                        <p style="margin: 12px 0;">Your last order of Premium Protein Bars (24-count cases) was on January 15th. Based on your typical 30-day cycle, you might be ready to reorder.</p>
+                        <p style="margin: 12px 0;">Reply YES to place an order or let me know your preferred timing.</p>
+                        <p><strong>Best regards,</strong><br>ReorderFlow for ABC Foods</p>
+                    </div>
+                    <div class="reminder-buttons">
+                        <button class="btn-small btn-green">✓ Reply YES</button>
+                        <button class="btn-small btn-gray">Call me</button>
+                        <button class="btn-small btn-gray">Next week</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section section-white">
+        <div class="container">
+            <h2 class="section-title">Everything You Need to Automate Reorders</h2>
+            
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon icon-blue">📊</div>
+                    <h3>Smart Scheduling</h3>
+                    <p>AI-powered timing based on order history and patterns</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon icon-blue">📧</div>
+                    <h3>Multi-Channel Outreach</h3>
+                    <p>Email, SMS, and AI voice calls with escalation</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon icon-blue">🤖</div>
+                    <h3>AI Voice Assistant</h3>
+                    <p>Natural phone calls that sound human</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon icon-blue">📱</div>
+                    <h3>Response Tracking</h3>
+                    <p>Automatic logging of replies and order intent</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon icon-blue">🔗</div>
+                    <h3>CRM Integration</h3>
+                    <p>Sync with Salesforce, HubSpot, and more</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon icon-blue">📈</div>
+                    <h3>Analytics Dashboard</h3>
+                    <p>Track performance and optimize timing</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="section section-gray">
+        <div class="container">
+            <h2 class="section-title">Simple, Transparent Pricing</h2>
+            <p class="section-subtitle">Start free, scale as you grow</p>
+            
+            <div class="grid-3">
+                <div class="pricing-card">
+                    <h3 style="font-size: 1.5rem; font-weight: bold;">Starter</h3>
+                    <div class="price">$29<span class="price-period">/month</span></div>
+                    <ul class="features">
+                        <li><span class="checkmark">✓</span>100 contacts</li>
+                        <li><span class="checkmark">✓</span>500 reminders/month</li>
+                        <li><span class="checkmark">✓</span>Email & SMS</li>
+                        <li><span class="checkmark">✓</span>Basic analytics</li>
+                    </ul>
+                    <a href="#" class="btn-primary" style="width: 100%; text-align: center;">Start Free Trial</a>
+                </div>
+                
+                <div class="pricing-card pricing-popular">
+                    <div class="popular-badge">Most Popular</div>
+                    <h3 style="font-size: 1.5rem; font-weight: bold;">Professional</h3>
+                    <div class="price">$79<span class="price-period">/month</span></div>
+                    <ul class="features">
+                        <li><span class="checkmark">✓</span>500 contacts</li>
+                        <li><span class="checkmark">✓</span>2,000 reminders/month</li>
+                        <li><span class="checkmark">✓</span>AI voice calls</li>
+                        <li><span class="checkmark">✓</span>CRM integration</li>
+                        <li><span class="checkmark">✓</span>Advanced analytics</li>
+                    </ul>
+                    <a href="#" class="btn-primary" style="width: 100%; text-align: center;">Start Free Trial</a>
+                </div>
+                
+                <div class="pricing-card">
+                    <h3 style="font-size: 1.5rem; font-weight: bold;">Enterprise</h3>
+                    <div class="price">$199<span class="price-period">/month</span></div>
+                    <ul class="features">
+                        <li><span class="checkmark">✓</span>Unlimited contacts</li>
+                        <li><span class="checkmark">✓</span>Unlimited reminders</li>
+                        <li><span class="checkmark">✓</span>Multi-user accounts</li>
+                        <li><span class="checkmark">✓</span>Priority support</li>
+                        <li><span class="checkmark">✓</span>Custom integrations</li>
+                    </ul>
+                    <a href="#" class="btn-primary" style="width: 100%; text-align: center;">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Stop Chasing Reorders?</h2>
+            <p>Join hundreds of CPG businesses saving time and increasing revenue with automated reorder reminders.</p>
+            <div class="cta-buttons">
+                <a href="#" class="btn-hero btn-hero-primary">Start Free Trial - No Credit Card Required</a>
+                <a href="#" class="btn-secondary">Schedule Demo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>ReorderFlow</h4>
+                    <p style="color: #9ca3af;">Automated reorder reminders for CPG businesses</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Integrations</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">API Docs</a></li>
+                        <li><a href="#">Status</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ReorderFlow. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Button click handlers
+        document.querySelectorAll('a[href="#"]').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (this.textContent.includes('Start Free Trial') || this.textContent.includes('Get Started')) {
+                    alert('Ready to build the signup flow! This will connect to our Supabase backend.');
+                } else if (this.textContent.includes('Demo')) {
+                    alert('Demo feature coming soon!');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
